@@ -74,3 +74,49 @@ SELECT count(DISTINCT product_name) FROM product_list;
 SELECT count(DISTINCT p.product_name) 
     FROM product_list p
     WHERE p.product_store_year => 24;
+
+
+-----------
+-- CROSS JOIN(상호조인)
+-----------
+--한쪽 테이블의 모든 행과 다른 쪽 테이블의 모든 행을 조인함.
+-- 추후 정리 필요함.
+SELECT * FROM order_list CROSS JOIN customer;
+
+--- CROSS JOIN: 두 테이블의 모든 행을 조인함. 
+--- => 대용량 테이블 생성 CREATE TANLE ~ SELECT 
+CREATE TABLE cross_table 
+    SELECT * FROM customer.name
+    CROSS JOIN order_list.order_history;
+
+--LIMIT: 조회할 행 수 제한
+SELECT * FROM cross_table LIMIT 10;
+
+-----------
+-- SELF JOIN(자체조안)
+-----------
+-- 자기 자신과 JOIN
+-- 자기 자신을 두 번이상 호출 -> alias를 사용할 수 밖에 없는 JOIN
+SELECT * FROM employees; -- 107명
+
+-- 사원 정보, 매니저 이름을 함께 출력
+-- 방법 1.
+SELECT emp.employee_id,
+    emp.first_name,
+    emp.manager_id,
+    man.employee_id,
+    man.first_name
+    FROM employees emp 
+    JOIN employees man
+    ON emp.manager_id = man.employee_id
+    ORDER BY emp.employee_id;
+
+-- 방법 2.
+SELECT emp.employee_id,
+    emp.first_name,
+    emp.manager_id,
+    man.employee_id,
+    man.first_name
+    FROM employees emp, employees man
+    WHERE emp.manager_id = man.employee_id (+) -- LEFT OUTER join : (+)추가
+    ORDER BY emp.employee_id;
