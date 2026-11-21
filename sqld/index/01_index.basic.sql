@@ -83,3 +83,78 @@ ALTER TABLE member ADD CONSTRAINT UNIQUE(mem_name); -- 보조 인덱스 생성
 --고유키 여러개 설정 가능하고, 기존 고유키 제거할 필요 없음.
 
 SELECT * FROM member; -- mem_name 컬럼 기준 정렬되지 않음.
+
+
+---- 인덱스 구조
+-- 페이지: MySQL에서 데이터를 저장하는 단위, 16KB(16384byte) 크기
+-- 인덱스 구조: B+Tree 구조로 되어 있음.
+-- B+Tree 구조: 데이터가 정렬되어 저장되며, 검색 속도가 빠름.
+-- Index 구조: 루트 노드, 내부 노드, 리프 노드로 구성됨.
+-- Index 구조: 루트 노드 -> 내부 노드 -> 리프 노드 순으로 검색됨.
+-- Inesert 구문에서 Index는 데이터 변경 작업이 오히려 느려짐 
+
+
+--- 클러스트형 인덱스 균형 트리 구조
+CREATE TABLE clustTbr (
+    mem_id CHAR(8) , 
+    mem_name VARCHAR(10), 
+);
+
+INSERT INTO clustIndexTbr VALUES('TWS', '트와이스');
+INSERT INTO clustIndexTbr VALUES('BLK', '블랙핑크');
+INSERT INTO clustIndexTbr VALUES('WHN', '여자친구');
+INSERT INTO clustIndexTbr VALUES('OMY', '오마이걸');
+INSERT INTO clustIndexTbr VALUES('BTS', '방탄소년단');
+INSERT INTO clustIndexTbr VALUES('NCT', '엔시티');
+INSERT INTO clustIndexTbr VALUES('EXO', '엑소');
+INSERT INTO clustIndexTbr VALUES('SE7EN', '세븐');
+INSERT INTO clustIndexTbr VALUES('BIGBANG', '빅뱅');
+INSERT INTO clustIndexTbr VALUES('2PM', '투피엠');
+
+SELECT * FROM clustTbr; 
+
+-- 클러스터형 인덱스 생성
+ALTER TABLE clustTbr ADD CONSTRAINT PRIMARY KEY(mem_id); 
+
+-- 기본키(mem_id)로 컬럼 기준 자동 정렬
+SELECT * FROM clustTbr; 
+
+-- 위 결과: 데이터 페이지 정렬되고 균형 트리 형태의 인덱스 형성됨.
+-- 클러스트형 인덱스는 데이터 페이지 정렬되며, 검색 속도가 빠름.
+-- 클러스트형 인덱스는 루투페이지와 리프페이지로 구성됨.
+-- => 인덱스 페이지의 리프 페이지는 데이터 페이지 그 자체임.
+
+
+--- 보조 인덱스에서 균형 트리 구성
+CREATE TABLE nonClustTbr (
+    mem_id CHAR(8) , 
+    mem_name VARCHAR(10), 
+);
+
+INSERT INTO clustIndexTbr VALUES('TWS', '트와이스');
+INSERT INTO clustIndexTbr VALUES('BLK', '블랙핑크');
+INSERT INTO clustIndexTbr VALUES('WHN', '여자친구');
+INSERT INTO clustIndexTbr VALUES('OMY', '오마이걸');
+INSERT INTO clustIndexTbr VALUES('BTS', '방탄소년단');
+INSERT INTO clustIndexTbr VALUES('NCT', '엔시티');
+INSERT INTO clustIndexTbr VALUES('EXO', '엑소');
+INSERT INTO clustIndexTbr VALUES('SE7EN', '세븐');
+INSERT INTO clustIndexTbr VALUES('BIGBANG', '빅뱅');
+INSERT INTO clustIndexTbr VALUES('2PM', '투피엠');
+
+
+-- mem_name 컬럼에 UNIQUE 지정 후 보조 인덱스 생성
+Alter TABLE nonClustTbr ADD CONSTRAINT UNIQUE(mem_name); 
+
+SELECT * FROM nonClustTbr;
+-- 보조 인덱스는 루트페이지, 내부페이지, 리프페이지로 구성됨.
+-- 보조 인덱스는 리프페이지에 데이터 페이지의 주소를 저장함.
+-- 보조 인덱스는 데이터 페이지를 건드리지 않음. (데이터 페이지 정렬되지 않음)
+-- 보조 인덱스 구성 시 별도의 공간에 인덱스 페이지 생성함.
+-- 보조 인덱스는 데이터 위치가 페이지번호 +#위치로 기록되어 있음.
+
+
+--- 인덱스 검색
+-- 클러스트형 인덱스는 2개의 페이지만 읽어서 결과 생성
+-- 보조 인덱스는 3개의 페이지만 읽어서 결과 생성
+-- 인덱스 검색 시 보조 인덱스보다 클러스트형 인덱스가 조금 더 빠름.
