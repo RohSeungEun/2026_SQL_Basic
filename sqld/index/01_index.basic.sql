@@ -86,13 +86,13 @@ SELECT * FROM member; -- mem_name 컬럼 기준 정렬되지 않음.
 
 
 ---- 인덱스 구조
--- 페이지: MySQL에서 데이터를 저장하는 단위, 16KB(16384byte) 크기
--- 인덱스 구조: B+Tree 구조로 되어 있음.
+-- 인덱스 구조: B+Tree 구조로 되어 있음. 내부적으로 균형 트리임.
+-- 노드= 페이지: MySQL에서 데이터를 저장하는 단위, 16KB(16384byte) 크기
 -- B+Tree 구조: 데이터가 정렬되어 저장되며, 검색 속도가 빠름.
 -- Index 구조: 루트 노드, 내부 노드, 리프 노드로 구성됨.
 -- Index 구조: 루트 노드 -> 내부 노드 -> 리프 노드 순으로 검색됨.
 -- Inesert 구문에서 Index는 데이터 변경 작업이 오히려 느려짐 
-
+-- 인덱스 검색은 클러스트형/보조형 인덱스 이용해 데이터 검색함. 
 
 --- 클러스트형 인덱스 균형 트리 구조
 CREATE TABLE clustTbr (
@@ -131,16 +131,16 @@ CREATE TABLE nonClustTbr (
     mem_name VARCHAR(10), 
 );
 
-INSERT INTO clustIndexTbr VALUES('TWS', '트와이스');
-INSERT INTO clustIndexTbr VALUES('BLK', '블랙핑크');
-INSERT INTO clustIndexTbr VALUES('WHN', '여자친구');
-INSERT INTO clustIndexTbr VALUES('OMY', '오마이걸');
-INSERT INTO clustIndexTbr VALUES('BTS', '방탄소년단');
-INSERT INTO clustIndexTbr VALUES('NCT', '엔시티');
-INSERT INTO clustIndexTbr VALUES('EXO', '엑소');
-INSERT INTO clustIndexTbr VALUES('SE7EN', '세븐');
-INSERT INTO clustIndexTbr VALUES('BIGBANG', '빅뱅');
-INSERT INTO clustIndexTbr VALUES('2PM', '투피엠');
+INSERT INTO nonClustTbr VALUES('TWS', '트와이스');
+INSERT INTO nonClustTbr VALUES('BLK', '블랙핑크');
+INSERT INTO nonClustTbr VALUES('WHN', '여자친구');
+INSERT INTO nonClustTbr VALUES('OMY', '오마이걸');
+INSERT INTO nonClustTbr VALUES('BTS', '방탄소년단');
+INSERT INTO nonClustTbr VALUES('NCT', '엔시티');
+INSERT INTO nonClustTbr VALUES('EXO', '엑소');
+INSERT INTO nonClustTbr VALUES('SE7EN', '세븐');
+INSERT INTO nonClustTbr VALUES('BIGBANG', '빅뱅');
+INSERT INTO nonClustTbr VALUES('2PM', '투피엠');
 
 
 -- mem_name 컬럼에 UNIQUE 지정 후 보조 인덱스 생성
